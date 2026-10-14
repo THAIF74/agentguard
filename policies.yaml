@@ -1,0 +1,16 @@
+rules:
+  - name: no_dangerous_shell
+    description: Block any shell command with rm -rf or sudo
+    match:
+      tool: shell
+    deny_if:
+      arg_contains: ["rm -rf", "sudo", "mkfs"]
+
+  - name: no_big_transactions
+    description: Block payments over $1000
+    match:
+      tool: make_payment
+    deny_if:
+      arg_greater_than:
+        field: amount
+        value: 1000
