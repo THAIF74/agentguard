@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+    <title>AgentGuard Dashboard</title>
+    <style>
+        body { font-family: monospace; background: #0f1115; color: #ddd; margin: 0; padding: 20px; }
+        h1 { color: #fff; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn {
+            padding: 15px 30px; font-size: 18px; font-weight: bold; border: none;
+            border-radius: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .btn.freeze { background: #d32f2f; color: white; }
+        .btn.unfreeze { background: #388e3c; color: white; }
+        .btn:hover { opacity: 0.8; }
+        .log { border: 1px solid #333; border-radius: 8px; padding: 10px; background: #1a1d24; }
+        .entry { padding: 8px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
+        .entry:last-child { border-bottom: none; }
+        .ok { color: #4caf50; }
+        .blocked { color: #f44336; }
+        .time { color: #888; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛡️ AgentGuard Live</h1>
+        <button id="freezeBtn" class="btn freeze" onclick="toggleFreeze()">FREEZE AGENT</button>
+    </div>
+    
+    <div class="log" id="log">
+        <p style="text-align:center; color:#888;">Waiting for agent actions...</p>
+    </div>
+
+<script>
+    async function fetchData() {
+        const res = await fetch('/api/events');
+        const data = await res.json();
+        
+        // Update Button
+        const btn = document.getElementById('freezeBtn');
+        if (data.frozen) {
+            btn.className = 'btn unfreeze';
+            btn.innerText = 'UNFREEZE AGENT';
+        } else {
+            btn.className = 'btn freeze';
+            btn.innerText = 'FREEZE AGENT';
+        }
+
+        // Update Log
+        const log = document.getElementById('log');
+        if (data.events.length === 0) return;
+        
+        log.innerHTML = data.events.reverse().map(e => {
+            const isOk = e.allowed === 1;
+            const status = isOk ? '<span class="ok">ALLOWED</span>' : '<span class="blocked">BLOCKED</span>';
+            const time = new Date(e.timestamp * 1000).toLocaleTimeString();
+            return `
+                <div class="entry">
+                    <div><span class="time">${time}</span> | <b>${e.tool}</b> ${e.args}</div>
+                    <div>${status} ${e.reason ? `<br><small style="color:#f44336">${e.reason}</small>` : ''}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function toggleFreeze() {
+        await fetch('/api/freeze', { method: 'POST' });
+        fetchData();
+    }
+
+    // Poll the server every 1 second
+    setInterval(fetchData, 1000);
+    fetchData();
+</script>
+</body>
+</html>
