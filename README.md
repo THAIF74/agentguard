@@ -3,10 +3,12 @@
 Runtime policy enforcement and tamper-proof audit logs for AI agents. Blocks dangerous tool calls before they execute.
 
 ## Why?
-AI agents are powerful but unpredictable. They can accidentally run m -rf /, leak data, or overspend. Existing tools only *observe* (logging). AgentGuard *enforces* rules at runtime and provides a cryptographic audit trail.
+AI agents are powerful but unpredictable. They can accidentally run 
+m -rf /, leak data, or overspend. Existing tools only *observe* (logging). AgentGuard *enforces* rules at runtime and provides a cryptographic audit trail.
 
 ## Features
-- **Policy Engine:** Define YAML rules (e.g., block m -rf, limit payments to ).
+- **Policy Engine:** Define YAML rules (e.g., block 
+m -rf, limit payments to ).
 - **Tamper-Proof Audit Log:** Cryptographically chained logs that detect if anyone tries to alter history.
 - **Live Dashboard:** Real-time web UI showing agent actions.
 - **Kill Switch:** Instantly freeze a rogue agent with a big red button.
@@ -28,3 +30,4 @@ python -m examples.demo_agent
 2. Before any tool runs, it checks policies.yaml.
 3. It checks if the system is frozen (.frozen file).
 4. Every decision is logged with a SHA-256 hash chain in udit.db.
+<img width="1913" height="880" alt="image" src="https://github.com/user-attachments/assets/33147e7b-3e16-4c8a-9345-2e9c7681995a" />
